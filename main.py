@@ -1,3 +1,9 @@
+'''
+Author: LittleYanlin
+Date: 2025-4-26
+Description: 旧书回收系统后端
+Version: 1.0
+'''
 from flask import Flask,request,url_for, send_from_directory
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
