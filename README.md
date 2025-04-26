@@ -1,3 +1,4 @@
+本程序对应的后端链接[BookRecycle-Frontend](https://github.com/LittleYanlin/BookRecycle-Frontend)
 # 旧书回收利用系统--后端
 
 ## 简介
@@ -47,7 +48,7 @@
 开发后端时使用的Python版本为3.9.13，其余依赖请严格按照 `requirement.txt`中的版本安装
 
 如果数据库没有正确初始化，应该先删除`\instance\data.db`文件，然后在目录下输入 `flask create`命令即可
-
+**重要：不可以更改flask的端口，必须是5000端口，除非在前端vite的配置中更改反向代理端口**
 ### 默认数据
 
 默认超级管理员：
