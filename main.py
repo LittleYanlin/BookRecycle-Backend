@@ -16,7 +16,7 @@ import uuid
 from flask_jwt_extended import JWTManager, create_access_token, create_refresh_token, jwt_required, get_jwt_identity , get_jwt
 from datetime import timedelta
 app = Flask(__name__)
-CORS(app)
+CORS(app,expose_headers=["Req_user"])
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = 'static/uploads'  # 上传文件存储路径
@@ -172,7 +172,7 @@ def manage_data(message):
 @app.route('/')
 def index():
     return "后端启动成功！"
-@app.route('/refresh', methods=['POST'])
+@app.route('/refresh', methods=['GET'])
 @jwt_required(refresh=True)  # 必须提供 refresh_token
 def refresh():
     current_user = get_jwt_identity()
@@ -269,13 +269,13 @@ def first_login():
             "status": 0,
             "message": str(e)
         }
-@app.route('/get_uploaded_books', methods=['POST'])#旧书再利用模块
+@app.route('/get_uploaded_books', methods=['GET'])#旧书再利用模块
 @jwt_required()
 def get_books():
     try:
         username=get_jwt_identity()
         user=Stu.query.filter_by(username=username).first()
-        action=request.form.get("action")
+        action=request.headers.get("Action")
         if(get_jwt()["role"]=="3"):
             books=Book_Upload.query.all()
         else:
@@ -303,12 +303,12 @@ def get_books():
             "status": 0,
             "message": str(e)
         }
-@app.route('/get_user_upload_books', methods=['POST'])#显示旧书回收模块
+@app.route('/get_user_upload_books', methods=['GET'])#显示旧书回收模块
 @jwt_required()
 def get_other_books():
     try:
         username=get_jwt_identity()
-        action=request.form.get("action")
+        action=request.headers.get("Action")
         if action=='all':
             user=Booker.query.filter_by(username=username).first()
             books = Book_Recycle.query.filter(and_(Book_Recycle.place==user.place,Book_Recycle.available)).all()
@@ -500,12 +500,12 @@ def get_order():
             "status": 0,
             "message": str(e)
         }
-@app.route("/get_order_detail",methods=['POST'])
+@app.route("/get_order_detail",methods=['GET'])
 @jwt_required()
 def get_order_detail():
     try:
         user = get_jwt_identity()
-        data=Book_Recycle.query.filter_by(id=request.form.get("id")).first()
+        data=Book_Recycle.query.filter_by(id=request.headers.get("id")).first()
         uploader=Stu.query.filter_by(username=data.uploader).first()
         if get_jwt()["role"]!="2" or data.booker!=user:
             return {
@@ -640,12 +640,12 @@ def upload_hub():
             "status": 0,
             "message": str(e)
         }
-@app.route("/book_end",methods=['POST'])
+@app.route("/book_end",methods=['GET'])
 @jwt_required()
 def book_end():
     try:
         user = get_jwt_identity()
-        data=Book_Upload.query.filter_by(id=request.form.get("id")).first()
+        data=Book_Upload.query.filter_by(id=request.headers.get("id")).first()
         if not data:
             return{
                 "status":0,
@@ -667,7 +667,7 @@ def book_end():
             "status": 0,
             "message": str(e)
         }
-@app.route("/admin/user/stu",methods=['POST'])
+@app.route("/admin/user/stu",methods=['GET'])
 @jwt_required()
 def manage_user():
     try:
@@ -726,7 +726,7 @@ def stu_manage():
             "status": 0,
             "message": str(e)
         }
-@app.route("/manage/1",methods=['POST'])
+@app.route("/manage/1",methods=['POST','GET'])
 @jwt_required()
 def user_manage():
     try:
@@ -739,7 +739,7 @@ def user_manage():
                 "message": "未授权"
             }
         userData=Stu.query.filter_by(username=user).first()
-        if action=='check':
+        if action=='check' or request.method=='GET':
             return{
                 "status":1,
                 "data":{
@@ -772,7 +772,7 @@ def user_manage():
             "status": 0,
             "message": str(e)
         }
-@app.route("/manage/2",methods=['POST'])
+@app.route("/manage/2",methods=['POST','GET'])
 @jwt_required()
 def booker_manage():
     try:
@@ -785,7 +785,7 @@ def booker_manage():
                 "message": "未授权"
             }
         userData=Booker.query.filter_by(username=user).first()
-        if action=='check':
+        if action=='check' or request.method=='GET':
             return{
                 "status":1,
                 "data":{
@@ -814,7 +814,7 @@ def booker_manage():
             "status": 0,
             "message": str(e)
         }
-@app.route("/manage/3",methods=['POST'])
+@app.route("/manage/3",methods=['POST','GET'])
 @jwt_required()
 def admin_manage():
     try:
@@ -827,7 +827,7 @@ def admin_manage():
                 "message": "未授权"
             }
         userData=Admin.query.filter_by(username=user).first()
-        if action=='check':
+        if action=='check' or request.method=='GET':
             return{
                 "status":1,
                 "data":{
@@ -854,7 +854,7 @@ def admin_manage():
             "status": 0,
             "message": str(e)
         }
-@app.route("/chat/get/all",methods=['POST'])
+@app.route("/chat/get/all",methods=['GET'])
 @jwt_required()
 def get_data():
     try:
@@ -880,11 +880,11 @@ def get_data():
             "status": 0,
             "message": str(e)
         }
-@app.route("/chat/get/detail",methods=['POST'])
+@app.route("/chat/get/detail",methods=['GET'])
 @jwt_required()
 def get_data_detail():
     try:
-        request_user=request.form.get("req_user")
+        request_user=request.headers.get("ReqUser")
         user = get_jwt_identity()
         if get_jwt()["role"]!="1":
                 return {
@@ -988,7 +988,7 @@ def upload_img():
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
-@app.route('/admin/score',methods=['POST'])
+@app.route('/admin/score',methods=['GET'])
 @jwt_required()
 def check_score():
     try:
