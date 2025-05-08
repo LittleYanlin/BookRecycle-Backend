@@ -138,13 +138,13 @@ URL：`/reg`
 | 传入值   | 说明         | 举例         | 备注                                   |
 | -------- | ------------ | ------------ | -------------------------------------- |
 | role     | 设置注册角色 | 1            | 必须 1为学生，2为收书员                |
-| username | 用户名       | 302024334011 | 必须                                   |
+| username | 用户名       | 302024334000 | 必须                                   |
 | password | 密码         | 无           | 必须                                   |
 | place    | 校区         | 1            | 必须 校区，1为朝晖，2为屏峰，3为莫干山 |
 | phone    | 电话         | 无           | 必须                                   |
 | shoukuan | 收款方式     | 支付宝       | role为1时必须                          |
 | address  | 地址         | 尚6          | role为1时必须                          |
-| name     | 姓名         | 周延霖       | role为2时必须                          |
+| name     | 姓名         | 牛比哥       | role为2时必须                          |
 
 | 返回值        | 说明     | 举例 | 类型   | 备注                 |
 | ------------- | -------- | ---- | ------ | -------------------- |
@@ -173,7 +173,7 @@ URL：`/check_first_login`
 
 ### 获取旧书再利用市场信息
 
-URL：`/get_uploaded_books`
+URL：`/store/getBooks`
 
 方法：`GET`
 
@@ -201,7 +201,7 @@ URL：`/get_uploaded_books`
 
 ### 显示旧书回收订单
 
-URL：`/get_user_upload_books`
+URL：`/official/getBooks`
 
 方法：`GET`
 加入headers传输：
@@ -231,7 +231,7 @@ URL：`/get_user_upload_books`
 
 ### 我要卖书模块上传
 
-URL：`/upload_book`
+URL：`/official/uploadBooks`
 
 方法：`POST`
 
@@ -242,7 +242,7 @@ URL：`/upload_book`
 
 ### 收书员完成收书
 
-URL：`/shoushu`
+URL：`/official/shoushu`
 
 方法：`POST`
 
@@ -254,7 +254,7 @@ URL：`/shoushu`
 
 ### 收书员获得订单
 
-URL：`/get_order`
+URL：`/official/getOrder`
 
 方法：`POST`
 
@@ -264,7 +264,7 @@ URL：`/get_order`
 
 ### 收书员获得学生信息
 
-URL：`/get_order_detail`
+URL：`/official/getOrderDetail`
 
 方法：`GET`
 加入headers传输：
@@ -283,7 +283,7 @@ URL：`/get_order_detail`
 
 ### 上传旧书再利用模块书籍
 
-URL：`/upload_book_hub`
+URL：`/store/uploadBooks`
 
 方法：`POST`
 
@@ -296,7 +296,7 @@ URL：`/upload_book_hub`
 
 ### 完成旧书再利用模块订单
 
-URL：`/book_end`
+URL：`/store/bookEnd`
 
 方法：`GET`
 加入headers传输：
