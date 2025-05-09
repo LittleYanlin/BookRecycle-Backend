@@ -36,7 +36,7 @@ def create():
     )
     admin=Admin(
         username="zhouyanlin",
-        password=generate_password_hash("abc123456"),
+        password=generate_password_hash("Abc@123456"),
         user_manage=True,
         score_manage=True,
         content_manage=True,

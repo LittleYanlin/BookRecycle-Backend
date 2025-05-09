@@ -3,6 +3,8 @@ from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 bp=Blueprint('admin', __name__, url_prefix='/admin')
 from app.database import db, Stu,Setting, Admin, Chat, Book_Upload, Report, Reason
 from datetime import datetime
+from werkzeug.security import generate_password_hash
+from check import *
 @bp.route("/user/stu",methods=['GET'])
 @jwt_required()
 def manage_user():
@@ -49,7 +51,12 @@ def stu_manage():
             }
         userData=Stu.query.filter_by(id=request.form.get("id")).first()
         if(request.form.get("new_pass")!=''):
-            userData.password=request.form.get("new_pass")
+            if not check_password(request.form.get("new_pass")):
+                return {
+                    "status": 0,
+                    "message": "密码格式错误！"
+                }
+            userData.password=generate_password_hash(request.form.get("new_pass"))
         userData.score=request.form.get("score")
         userData.money=request.form.get("money")
         db.session.commit()
@@ -308,9 +315,19 @@ def admin_admin():
         elif request.method=='POST':
             new_id=request.form.get("id")
             if new_id==None:
+                if not request.form.get("username") or not request.form.get("password"):
+                    return {
+                        "status": 0,
+                        "message": "请检查你输入的内容"
+                    }
+                if not check_password(request.form.get("password")):
+                    return {
+                        "status": 0,
+                        "message": "密码格式错误！"
+                    }
                 new_admin=Admin(
                     username=request.form.get("username"),
-                    password=request.form.get("password"),
+                    password=generate_password_hash(request.form.get("password")),
                     user_manage=True if request.form.get("user_manage") == "1" else False,
                     score_manage=True if request.form.get("score_manage")=="1" else False,
                     content_manage=True if request.form.get("content_manage")=="1" else False,
@@ -325,8 +342,14 @@ def admin_admin():
             else:
                 new_admin=Admin.query.filter_by(id=new_id).first()
                 password=request.form.get("password")
+                print(password)
                 if password!=None:
-                    new_admin.password=password
+                    if not check_password(password):
+                        return {
+                            "status": 0,
+                            "message": "密码格式错误！"
+                        }
+                    new_admin.password=generate_password_hash(password)
                 new_admin.user_manage=True if request.form.get("user_manage") == "1" else False
                 new_admin.score_manage=True if request.form.get("score_manage")=="1" else False
                 new_admin.content_manage=True if request.form.get("content_manage")=="1" else False
